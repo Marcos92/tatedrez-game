@@ -4,12 +4,7 @@ using UnityEngine.EventSystems;
 
 public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public enum Player
-    {
-        WHITE,
-        BLACK
-    }
-    public Player player;
+    public BoardManager.Player player;
 
     public enum Type
     {
@@ -21,16 +16,23 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     public Sprite[] sprites;
 
+    private Transform oldParent;
     private Transform newParent;
+
     public Image image;
 
-    void Awake()
+    void Start()
     {
         image.sprite = sprites[(int)type + (int)player * 3];
+        image.raycastTarget = false;
+
+        BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
+        UpdateState();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        oldParent = transform.parent;
         newParent = transform.parent;
 
         //Places the piece above everything on the hierarchy
@@ -46,9 +48,12 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
+
+        if (oldParent != newParent)
         {
-            if (newParent != transform.parent)
+            BoardManager.Instance.EndTurn();
+
+            if (oldParent.TryGetComponent<BoardTile>(out BoardTile tile))
             {
                 tile.RemovePiece();
             }
@@ -62,5 +67,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     public void SetNewParent(Transform t)
     {
         newParent = t;
+    }
+
+    private void UpdateState()
+    {
+        image.raycastTarget = player == BoardManager.Instance.playerTurn;
     }
 }

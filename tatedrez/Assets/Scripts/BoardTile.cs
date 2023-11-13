@@ -26,16 +26,12 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (!HasPiece())
-        {
-            GameObject drop = eventData.pointerDrag;
-            Piece p = drop.GetComponent<Piece>();
-            p.SetNewParent(transform);
+        GameObject drop = eventData.pointerDrag;
+        Piece p = drop.GetComponent<Piece>();
+        p.SetNewParent(transform);
+        piece = p;
 
-            piece = p;
-
-            StartCoroutine(nameof(HideHover));
-        }
+        StartCoroutine(nameof(HideHover));
     }
 
     public void OnPointerEnter(PointerEventData eventData)
