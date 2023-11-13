@@ -17,8 +17,13 @@ public class BoardManager : MonoBehaviour
             int y = i / boardSize - 1;
 
             board[i] = Instantiate(tilePrefab, transform);
-            board[i].transform.localPosition = new Vector2(x, y);
+            RectTransform rectTransform = board[i].GetComponent<RectTransform>();
+            float size = rectTransform.rect.width;
+            rectTransform.localPosition = new Vector2(x * size, y * size);
+
             board[i].SetColor(boardColors[i % 2]);
+
+            board[i].gameObject.name = "TILE " + (x + 2).ToString() + "-" + (y + 2).ToString();
         }
     }
 }

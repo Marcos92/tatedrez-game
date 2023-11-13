@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 300
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -138,7 +138,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: W_Horse
+      name: W_Knight
       rect:
         serializedVersion: 2
         x: 298
@@ -201,7 +201,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: B_Horse
+      name: B_Knight
       rect:
         serializedVersion: 2
         x: 298
@@ -254,10 +254,10 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       B_Bishop: -1366495447
-      B_Horse: 964707560
+      B_Knight: 964707560
       B_Rook: -718259344
       W_Bishop: -1514326357
-      W_Horse: 449496752
+      W_Knight: 449496752
       W_Rook: 156520403
       pieces_10: 536173191
       pieces_12: -399182476
