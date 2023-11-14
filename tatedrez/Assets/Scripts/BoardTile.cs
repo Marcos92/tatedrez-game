@@ -17,10 +17,14 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private Piece piece;
 
+    private bool interactable;
+
     void Awake()
     {
         tileImage = GetComponent<Image>();
         debugLabel = GetComponentInChildren<TMP_Text>();
+
+        interactable = true;
     }
 
     public void SetColor(Color color)
@@ -38,6 +42,9 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnDrop(PointerEventData eventData)
     {
+        if(!interactable)
+            return;
+
         GameObject drop = eventData.pointerDrag;
         Piece p = drop.GetComponent<Piece>();
         p.SetNewParent(transform);
@@ -48,6 +55,9 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if(!interactable)
+            return;
+
         if (!HasPiece())
         {
             StopAllCoroutines();
@@ -111,5 +121,10 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void HideValidMove()
     {
         StartCoroutine(FadeOutHighlight(validMoveImage));
+    }
+
+    public void ToggleInteraction(bool value)
+    {
+        interactable = value;
     }
 }

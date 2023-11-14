@@ -172,6 +172,9 @@ public class BoardManager : MonoBehaviour
 
     public void CheckValidMoves(BoardTile tile)
     {
+        if(currentPhase != Phase.CHESS)
+            return;
+
         int index = Array.IndexOf(board, tile);
         Piece.Type type = tile.GetPiece().type;
         validMoves = new bool[board.Length];
@@ -202,14 +205,22 @@ public class BoardManager : MonoBehaviour
             {
                 board[i].ShowValidMove();
             }
+            else
+            {
+                board[i].ToggleInteraction(false);
+            }
         }
     }
 
     public void ResetValidMoves()
     {
+        if(currentPhase != Phase.CHESS)
+            return;
+
         validMoves = new bool[board.Length];
         for (int i = 0; i < validMoves.Length; i++)
         {
+            board[i].ToggleInteraction(true);
             board[i].HideValidMove();
         }
     }
@@ -221,8 +232,8 @@ public class BoardManager : MonoBehaviour
 
         int upLimit = 0;
         int downLimit = (int)Mathf.Pow(boardSize, 2);
-        int leftLimit = boardSize * (GetColumn(index) + 1) - boardSize - 1;
-        int rightLimit = boardSize * (GetColumn(index) + 1);
+        int leftLimit = boardSize * (GetRow(index) + 1) - boardSize - 1;
+        int rightLimit = boardSize * (GetRow(index) + 1);
 
         //Up
         for (int i = index - verticalMove; i >= upLimit; i -= verticalMove)

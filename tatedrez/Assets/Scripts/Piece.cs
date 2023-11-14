@@ -36,7 +36,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         oldParent = transform.parent;
         newParent = transform.parent;
 
-        if (BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS && transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
+        if (transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
         {
             BoardManager.Instance.CheckValidMoves(tile);
         }
