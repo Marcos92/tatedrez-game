@@ -8,13 +8,14 @@ public class BoardManager : MonoBehaviour
     private const int boardSize = 3;
     public Color[] boardColors;
 
-    public enum Player
+    public enum PlayerColor
     {
         WHITE,
         BLACK
     }
-    public Player playerTurn;
+    public PlayerColor currentPlayerColor;
 
+    private int turnCounter;
     public UnityEvent endTurnEvent;
 
     public static BoardManager Instance { get; private set; }
@@ -46,23 +47,122 @@ public class BoardManager : MonoBehaviour
 
             board[i].SetColor(boardColors[i % 2]);
 
-            board[i].gameObject.name = "TILE " + (x + 2).ToString() + "-" + (y + 2).ToString();
+            board[i].SetLabel(i.ToString());
+            board[i].gameObject.name = "TILE " + i;
         }
 
-        playerTurn = Player.WHITE;
+        currentPlayerColor = PlayerColor.WHITE;
     }
 
     public void EndTurn()
     {
-        if (playerTurn == Player.WHITE)
+        if (++turnCounter >= boardSize * 2 - 1)
         {
-            playerTurn = Player.BLACK;
+            if (CheckMatch())
+            {
+                Debug.Log(currentPlayerColor + " wins!");
+            }
+        }
+
+        if (currentPlayerColor == PlayerColor.WHITE)
+        {
+            currentPlayerColor = PlayerColor.BLACK;
         }
         else
         {
-            playerTurn = Player.WHITE;
+            currentPlayerColor = PlayerColor.WHITE;
         }
 
         endTurnEvent.Invoke();
+    }
+
+    private bool CheckMatch()
+    {
+        //Columns
+        for (int i = 0; i < boardSize; i++)
+        {
+            if (board[i].CheckMatch(currentPlayerColor))
+            {
+                Debug.Log("Has piece on tile " + i);
+                for (int j = 1; j < boardSize; j++)
+                {
+                    if (!board[i + j * boardSize].CheckMatch(currentPlayerColor))
+                    {
+                        break;
+                    }
+
+                    Debug.Log("Has piece on tile " + (i + j * boardSize));
+
+                    if (j == boardSize - 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        //Rows
+        for (int i = 0; i < boardSize; i++)
+        {
+            if (board[i * boardSize].CheckMatch(currentPlayerColor))
+            {
+                Debug.Log("Has piece on tile " + (i * boardSize));
+                for (int j = 1; j < boardSize; j++)
+                {
+                    if (!board[i * boardSize + j].CheckMatch(currentPlayerColor))
+                    {
+                        break;
+                    }
+
+                    Debug.Log("Has piece on tile " + (i * boardSize + j));
+
+                    if (j == boardSize - 1)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        //Diagonals
+        if (board[0].CheckMatch(currentPlayerColor))
+        {
+            Debug.Log("Has piece on tile 0");
+            for (int i = boardSize + 1; i < Mathf.Pow(boardSize, 2); i += boardSize + 1)
+            {
+                if (!board[i].CheckMatch(currentPlayerColor))
+                {
+                    break;
+                }
+
+                Debug.Log("Has piece on tile " + i);
+
+                if (i == Mathf.Pow(boardSize, 2) - 1)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (board[boardSize - 1].CheckMatch(currentPlayerColor))
+        {
+            Debug.Log("Has piece on tile " + (boardSize - 1));
+            for (int i = (boardSize - 1) * 2; i <= Mathf.Pow(boardSize, 2) - boardSize; i += boardSize - 1)
+            {
+                if (!board[i].CheckMatch(currentPlayerColor))
+                {
+                    break;
+                }
+
+                Debug.Log("Has piece on tile " + i);
+
+                if (i == Mathf.Pow(boardSize, 2) - boardSize)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

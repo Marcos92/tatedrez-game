@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDropHandler
 {
     private Image image;
+    private TMP_Text debugLabel;
 
     [Header("Hover")]
     public Image hoverImage;
@@ -17,11 +19,17 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     void Awake()
     {
         image = GetComponent<Image>();
+        debugLabel = GetComponentInChildren<TMP_Text>();
     }
 
     public void SetColor(Color color)
     {
         image.color = color;
+    }
+
+    public void SetLabel(string text)
+    {
+        debugLabel.text = text;
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -53,7 +61,7 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         float alpha = hoverImage.color.a;
 
-        while (alpha < 1.0f)
+        while (alpha < 0.75f)
         {
             alpha += hoverFadeInSpeed * Time.deltaTime;
             hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, alpha);
@@ -81,5 +89,10 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void RemovePiece()
     {
         piece = null;
+    }
+
+    public bool CheckMatch(BoardManager.PlayerColor color)
+    {
+        return HasPiece() && piece.playerColor == color;
     }
 }

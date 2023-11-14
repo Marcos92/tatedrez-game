@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public BoardManager.Player player;
+    public BoardManager.PlayerColor playerColor;
 
     public enum Type
     {
@@ -23,7 +23,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     void Start()
     {
-        image.sprite = sprites[(int)type + (int)player * 3];
+        image.sprite = sprites[(int)type + (int)playerColor * 3];
         image.raycastTarget = false;
 
         BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
@@ -71,6 +71,6 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     private void UpdateState()
     {
-        image.raycastTarget = player == BoardManager.Instance.playerTurn;
+        image.raycastTarget = playerColor == BoardManager.Instance.currentPlayerColor;
     }
 }
