@@ -19,10 +19,11 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     private Transform oldParent;
     private Transform newParent;
 
-    public Image image;
+    private Image image;
 
     void Start()
     {
+        image = GetComponent<Image>();
         image.sprite = sprites[(int)type + (int)playerColor * 3];
         image.raycastTarget = false;
 
@@ -48,20 +49,23 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
-
         if (oldParent != newParent)
         {
-            BoardManager.Instance.EndTurn();
-
             if (oldParent.TryGetComponent<BoardTile>(out BoardTile tile))
             {
                 tile.RemovePiece();
             }
-        }
 
-        transform.SetParent(newParent);
-        transform.localPosition = Vector2.zero;
-        image.raycastTarget = true;
+            transform.SetParent(newParent);
+            transform.localPosition = Vector2.zero;
+
+            BoardManager.Instance.EndTurn();
+        }
+        else
+        {
+            transform.SetParent(oldParent);
+            transform.localPosition = Vector2.zero;
+        }
     }
 
     public void SetNewParent(Transform t)
@@ -71,6 +75,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     private void UpdateState()
     {
-        image.raycastTarget = playerColor == BoardManager.Instance.currentPlayerColor;
+        bool isPlayerTurn = playerColor == BoardManager.Instance.currentPlayerColor;
+        bool isValidForTictactoe = !transform.parent.GetComponent<BoardTile>() && BoardManager.Instance.currentPhase == BoardManager.Phase.TICTACTOE;
+        bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS;
+
+        image.raycastTarget = isPlayerTurn && (isValidForTictactoe || isValidForChess);
     }
 }

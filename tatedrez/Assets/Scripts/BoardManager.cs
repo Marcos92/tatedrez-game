@@ -15,6 +15,13 @@ public class BoardManager : MonoBehaviour
     }
     public PlayerColor currentPlayerColor;
 
+    public enum Phase
+    {
+        TICTACTOE,
+        CHESS
+    }
+    public Phase currentPhase;
+
     private int turnCounter;
     public UnityEvent endTurnEvent;
 
@@ -52,6 +59,7 @@ public class BoardManager : MonoBehaviour
         }
 
         currentPlayerColor = PlayerColor.WHITE;
+        currentPhase = Phase.TICTACTOE;
     }
 
     public void EndTurn()
@@ -62,6 +70,11 @@ public class BoardManager : MonoBehaviour
             {
                 Debug.Log(currentPlayerColor + " wins!");
             }
+        }
+
+        if(turnCounter >= boardSize * 2)
+        {
+            currentPhase = Phase.CHESS;
         }
 
         if (currentPlayerColor == PlayerColor.WHITE)
