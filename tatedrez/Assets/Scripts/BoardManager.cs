@@ -187,6 +187,7 @@ public class BoardManager : MonoBehaviour
                 break;
 
             case Piece.Type.KNIGHT:
+                CheckKnightValidMoves(index);
                 break;
         }
 
@@ -342,6 +343,21 @@ public class BoardManager : MonoBehaviour
                 {
                     break;
                 }
+            }
+        }
+    }
+
+    private void CheckKnightValidMoves(int index)
+    {
+        int[] moves = { -(boardSize - 2), -(boardSize * 2 - 1), -(boardSize * 2 + 1), boardSize - 2, boardSize * 2 - 1, boardSize * 2 + 1 };
+
+        for (int i = 0; i < moves.Length; i++)
+        {
+            int newIndex = index + moves[i];
+            if (newIndex >= 0 && newIndex < (int)Mathf.Pow(boardSize, 2) && !board[newIndex].HasPiece()
+            && !IsOnSameColumn(index, newIndex) && !IsOnSameRow(index, newIndex))
+            {
+                validMoves[newIndex] = true;
             }
         }
     }
