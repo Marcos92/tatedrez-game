@@ -44,13 +44,15 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if(!interactable)
             return;
-
-        GameObject drop = eventData.pointerDrag;
-        Piece p = drop.GetComponent<Piece>();
-        p.SetNewParent(transform);
-        piece = p;
-
-        StartCoroutine(FadeOutHighlight(hoverImage));
+        
+        if(!HasPiece())
+        {
+            GameObject drop = eventData.pointerDrag;
+            Piece p = drop.GetComponent<Piece>();
+            p.SetNewParent(transform);
+            piece = p;
+            StartCoroutine(FadeOutHighlight(hoverImage));
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
