@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -25,6 +26,8 @@ public class BoardManager : MonoBehaviour
     private int turnCounter;
     public UnityEvent endTurnEvent;
 
+    private bool[] validMoves;
+
     public static BoardManager Instance { get; private set; }
     private void Awake()
     {
@@ -44,8 +47,8 @@ public class BoardManager : MonoBehaviour
 
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            int x = i % boardSize - 1;
-            int y = i / boardSize - 1;
+            int x = GetColumn(i) - 1;
+            int y = GetRow(i) - 1;
 
             board[i] = Instantiate(tilePrefab, transform);
             RectTransform rectTransform = board[i].GetComponent<RectTransform>();
@@ -72,7 +75,7 @@ public class BoardManager : MonoBehaviour
             }
         }
 
-        if(turnCounter >= boardSize * 2)
+        if (turnCounter >= boardSize * 2)
         {
             currentPhase = Phase.CHESS;
         }
@@ -96,15 +99,12 @@ public class BoardManager : MonoBehaviour
         {
             if (board[i].CheckMatch(currentPlayerColor))
             {
-                Debug.Log("Has piece on tile " + i);
                 for (int j = 1; j < boardSize; j++)
                 {
                     if (!board[i + j * boardSize].CheckMatch(currentPlayerColor))
                     {
                         break;
                     }
-
-                    Debug.Log("Has piece on tile " + (i + j * boardSize));
 
                     if (j == boardSize - 1)
                     {
@@ -119,15 +119,12 @@ public class BoardManager : MonoBehaviour
         {
             if (board[i * boardSize].CheckMatch(currentPlayerColor))
             {
-                Debug.Log("Has piece on tile " + (i * boardSize));
                 for (int j = 1; j < boardSize; j++)
                 {
                     if (!board[i * boardSize + j].CheckMatch(currentPlayerColor))
                     {
                         break;
                     }
-
-                    Debug.Log("Has piece on tile " + (i * boardSize + j));
 
                     if (j == boardSize - 1)
                     {
@@ -140,15 +137,12 @@ public class BoardManager : MonoBehaviour
         //Diagonals
         if (board[0].CheckMatch(currentPlayerColor))
         {
-            Debug.Log("Has piece on tile 0");
             for (int i = boardSize + 1; i < Mathf.Pow(boardSize, 2); i += boardSize + 1)
             {
                 if (!board[i].CheckMatch(currentPlayerColor))
                 {
                     break;
                 }
-
-                Debug.Log("Has piece on tile " + i);
 
                 if (i == Mathf.Pow(boardSize, 2) - 1)
                 {
@@ -159,15 +153,12 @@ public class BoardManager : MonoBehaviour
 
         if (board[boardSize - 1].CheckMatch(currentPlayerColor))
         {
-            Debug.Log("Has piece on tile " + (boardSize - 1));
             for (int i = (boardSize - 1) * 2; i <= Mathf.Pow(boardSize, 2) - boardSize; i += boardSize - 1)
             {
                 if (!board[i].CheckMatch(currentPlayerColor))
                 {
                     break;
                 }
-
-                Debug.Log("Has piece on tile " + i);
 
                 if (i == Mathf.Pow(boardSize, 2) - boardSize)
                 {
@@ -177,5 +168,201 @@ public class BoardManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void CheckValidMoves(BoardTile tile)
+    {
+        int index = Array.IndexOf(board, tile);
+        Piece.Type type = tile.GetPiece().type;
+        validMoves = new bool[board.Length];
+
+        switch (type)
+        {
+            case Piece.Type.ROOK:
+                CheckRookValidMoves(index);
+                break;
+
+            case Piece.Type.BISHOP:
+                CheckBishopValidMoves(index);
+                break;
+
+            case Piece.Type.KNIGHT:
+                break;
+        }
+
+        HighlightValidMoves();
+    }
+
+    private void HighlightValidMoves()
+    {
+        for (int i = 0; i < validMoves.Length; i++)
+        {
+            if (validMoves[i])
+            {
+                board[i].ShowValidMove();
+            }
+        }
+    }
+
+    public void ResetValidMoves()
+    {
+        validMoves = new bool[board.Length];
+        for (int i = 0; i < validMoves.Length; i++)
+        {
+            board[i].HideValidMove();
+        }
+    }
+
+    private void CheckRookValidMoves(int index)
+    {
+        int verticalMove = boardSize;
+        int horizontalMove = 1;
+
+        int upLimit = 0;
+        int downLimit = (int)Mathf.Pow(boardSize, 2);
+        int leftLimit = boardSize * (GetColumn(index) + 1) - boardSize - 1;
+        int rightLimit = boardSize * (GetColumn(index) + 1);
+
+        //Up
+        for (int i = index - verticalMove; i >= upLimit; i -= verticalMove)
+        {
+            if (!board[i].HasPiece())
+            {
+                validMoves[i] = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        //Down
+        for (int i = index + verticalMove; i < downLimit; i += verticalMove)
+        {
+            if (!board[i].HasPiece())
+            {
+                validMoves[i] = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        //Left
+        for (int i = index - horizontalMove; i > leftLimit; i -= horizontalMove)
+        {
+            if (!board[i].HasPiece())
+            {
+                validMoves[i] = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        //Right
+        for (int i = index + horizontalMove; i < rightLimit; i += horizontalMove)
+        {
+            if (!board[i].HasPiece())
+            {
+                validMoves[i] = true;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    private void CheckBishopValidMoves(int index)
+    {
+        int leftDiagonalMove = boardSize + 1;
+        int rightDiagonalMove = boardSize - 1;
+
+        //Up-Left
+        if (GetColumn(index) > 0 && GetRow(index) > 0)
+        {
+            for (int i = index - leftDiagonalMove; i >= 0; i -= leftDiagonalMove)
+            {
+                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
+                {
+                    validMoves[i] = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        //Down-Right
+        if (GetColumn(index) < boardSize - 1 && GetRow(index) < boardSize - 1)
+        {
+            for (int i = index + leftDiagonalMove; i < (int)Mathf.Pow(boardSize, 2); i += leftDiagonalMove)
+            {
+                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
+                {
+                    validMoves[i] = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        //Up-Right
+        if (GetColumn(index) < boardSize - 1 && GetRow(index) > 0)
+        {
+            for (int i = index - rightDiagonalMove; i >= 0; i -= rightDiagonalMove)
+            {
+                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
+                {
+                    validMoves[i] = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        //Down-Left
+        if (GetColumn(index) > 0 && GetRow(index) < boardSize - 1)
+        {
+            for (int i = index + rightDiagonalMove; i < (int)Mathf.Pow(boardSize, 2); i += rightDiagonalMove)
+            {
+                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
+                {
+                    validMoves[i] = true;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    private int GetRow(int i)
+    {
+        return i / boardSize;
+    }
+
+    private int GetColumn(int i)
+    {
+        return i % boardSize;
+    }
+
+    private bool IsOnSameRow(int a, int b)
+    {
+        return GetRow(a) == GetRow(b);
+    }
+
+    private bool IsOnSameColumn(int a, int b)
+    {
+        return GetColumn(a) == GetColumn(b);
     }
 }

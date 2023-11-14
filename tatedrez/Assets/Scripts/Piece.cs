@@ -36,6 +36,11 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         oldParent = transform.parent;
         newParent = transform.parent;
 
+        if (BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS && transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
+        {
+            BoardManager.Instance.CheckValidMoves(tile);
+        }
+
         //Places the piece above everything on the hierarchy
         transform.SetParent(transform.root);
         transform.SetAsLastSibling();
@@ -65,7 +70,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         {
             transform.SetParent(oldParent);
             transform.localPosition = Vector2.zero;
+            image.raycastTarget = true;
         }
+
+        BoardManager.Instance.ResetValidMoves();
     }
 
     public void SetNewParent(Transform t)

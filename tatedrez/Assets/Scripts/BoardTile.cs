@@ -6,30 +6,34 @@ using UnityEngine.UI;
 
 public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDropHandler
 {
-    private Image image;
+    private Image tileImage;
     private TMP_Text debugLabel;
 
-    [Header("Hover")]
+    [Header("Highlight")]
     public Image hoverImage;
-    public float hoverFadeInSpeed;
-    public float hoverFadeOutSpeed;
+    public Image validMoveImage;
+    public float highlightFadeInSpeed;
+    public float highlightFadeOutSpeed;
 
     private Piece piece;
 
     void Awake()
     {
-        image = GetComponent<Image>();
+        tileImage = GetComponent<Image>();
         debugLabel = GetComponentInChildren<TMP_Text>();
     }
 
     public void SetColor(Color color)
     {
-        image.color = color;
+        tileImage.color = color;
     }
 
     public void SetLabel(string text)
     {
-        debugLabel.text = text;
+        if (debugLabel)
+        {
+            debugLabel.text = text;
+        }
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -39,44 +43,42 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         p.SetNewParent(transform);
         piece = p;
 
-        StartCoroutine(nameof(HideHover));
+        StartCoroutine(FadeOutHighlight(hoverImage));
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!HasPiece())
         {
-            StopCoroutine(nameof(HideHover));
-            StartCoroutine(nameof(ShowHover));
+            StopAllCoroutines();
+            StartCoroutine(FadeInHighlight(hoverImage));
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        StopCoroutine(nameof(ShowHover));
-        StartCoroutine(nameof(HideHover));
+        StopAllCoroutines();
+        StartCoroutine(FadeOutHighlight(hoverImage));
     }
 
-    private IEnumerator ShowHover()
+    private IEnumerator FadeInHighlight(Image image)
     {
-        float alpha = hoverImage.color.a;
-
-        while (alpha < 0.75f)
+        while (image.color.a < 0.75f)
         {
-            alpha += hoverFadeInSpeed * Time.deltaTime;
-            hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, alpha);
+            float alpha = image.color.a;
+            alpha += highlightFadeInSpeed * Time.deltaTime;
+            image.color = new Color(image.color.r, image.color.g, image.color.b, alpha);
             yield return null;
         }
     }
 
-    private IEnumerator HideHover()
+    private IEnumerator FadeOutHighlight(Image image)
     {
-        float alpha = hoverImage.color.a;
-
-        while (alpha > 0.0f)
+        while (image.color.a > 0.0f)
         {
-            alpha -= hoverFadeOutSpeed * Time.deltaTime;
-            hoverImage.color = new Color(hoverImage.color.r, hoverImage.color.g, hoverImage.color.b, alpha);
+            float alpha = image.color.a;
+            alpha -= highlightFadeOutSpeed * Time.deltaTime;
+            image.color = new Color(image.color.r, image.color.g, image.color.b, alpha);
             yield return null;
         }
     }
@@ -84,6 +86,11 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public bool HasPiece()
     {
         return piece != null;
+    }
+
+    public Piece GetPiece()
+    {
+        return piece;
     }
 
     public void RemovePiece()
@@ -94,5 +101,15 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public bool CheckMatch(BoardManager.PlayerColor color)
     {
         return HasPiece() && piece.playerColor == color;
+    }
+
+    public void ShowValidMove()
+    {
+        StartCoroutine(FadeInHighlight(validMoveImage));
+    }
+
+    public void HideValidMove()
+    {
+        StartCoroutine(FadeOutHighlight(validMoveImage));
     }
 }
