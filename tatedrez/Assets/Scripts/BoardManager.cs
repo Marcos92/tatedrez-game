@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -64,7 +65,7 @@ public class BoardManager : MonoBehaviour
         }
 
         currentPlayerColor = PlayerColor.WHITE;
-        currentPhase = Phase.CHESS;
+        currentPhase = Phase.TICTACTOE;
     }
 
     public void EndTurn()
@@ -77,25 +78,37 @@ public class BoardManager : MonoBehaviour
             }
         }
 
-        if (turnCounter >= boardSize * 2)
-        {
-            currentPhase = Phase.CHESS;
-        }
+        ChangeGamePhase();
 
-        //ChangePlayerTurn();
+        ChangePlayerTurn();
 
         endTurnEvent.Invoke();
     }
 
+    private void ChangeGamePhase()
+    {
+        if (turnCounter >= boardSize * 2)
+        {
+            currentPhase = Phase.CHESS;
+            validMoves = new bool[board.Length];
+        }
+    }
+
     private void ChangePlayerTurn()
     {
-        if (currentPlayerColor == PlayerColor.WHITE)
+        PlayerColor otherPlayerColor = currentPlayerColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+
+        if (CheckIfPlayerHasValidMoves(otherPlayerColor))
         {
-            currentPlayerColor = PlayerColor.BLACK;
+            currentPlayerColor = otherPlayerColor;
+        }
+        else if (CheckIfPlayerHasValidMoves(currentPlayerColor))
+        {
+            Debug.Log(otherPlayerColor + " has no valid moves! " + currentPlayerColor + " can play again!");
         }
         else
         {
-            currentPlayerColor = PlayerColor.WHITE;
+            Debug.Log("No more moves! It's a tie!");
         }
     }
 
@@ -177,10 +190,10 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    public void CheckValidMoves(BoardTile tile)
+    public bool CheckIfPieceHasValidMoves(BoardTile tile, bool highlight = false)
     {
         if (currentPhase != Phase.CHESS)
-            return;
+            return false;
 
         int index = Array.IndexOf(board, tile);
         Piece.Type type = tile.GetPiece().type;
@@ -201,7 +214,28 @@ public class BoardManager : MonoBehaviour
                 break;
         }
 
-        HighlightValidMoves();
+        if (highlight)
+        {
+            HighlightValidMoves();
+        }
+
+        return !validMoves.All(value => !value); //Returns true if there is at least one valid move (not all elements are false)
+    }
+
+    private bool CheckIfPlayerHasValidMoves(PlayerColor playerColor)
+    {
+        if (currentPhase == Phase.TICTACTOE)
+            return true;
+
+        for (int i = 0; i < board.Length; i++)
+        {
+            if (board[i].HasPiece() && board[i].GetPiece().playerColor == playerColor && CheckIfPieceHasValidMoves(board[i]))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void HighlightValidMoves()
@@ -304,9 +338,9 @@ public class BoardManager : MonoBehaviour
         int first = Mathf.Min(a, b) + direction;
         int last = Mathf.Max(a, b);
 
-        for(int i = first; i < last; i += direction)
+        for (int i = first; i < last; i += direction)
         {
-            if(board[i].HasPiece())
+            if (board[i].HasPiece())
             {
                 return true;
             }
@@ -321,9 +355,9 @@ public class BoardManager : MonoBehaviour
         int first = Mathf.Min(a, b) + direction;
         int last = Mathf.Max(a, b);
 
-        for(int i = first; i < last; i += direction)
+        for (int i = first; i < last; i += direction)
         {
-            if(board[i].HasPiece())
+            if (board[i].HasPiece())
             {
                 return true;
             }
@@ -341,9 +375,9 @@ public class BoardManager : MonoBehaviour
         int direction = boardSize + (topLeftDiagonal ? 1 : -1);
         top += direction;
 
-        for(int i = top; i < bottom; i += direction)
+        for (int i = top; i < bottom; i += direction)
         {
-            if(board[i].HasPiece())
+            if (board[i].HasPiece())
             {
                 return true;
             }

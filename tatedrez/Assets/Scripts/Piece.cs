@@ -38,7 +38,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
         if (transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
         {
-            BoardManager.Instance.CheckValidMoves(tile);
+            BoardManager.Instance.CheckIfPieceHasValidMoves(tile, true);
         }
 
         //Places the piece above everything on the hierarchy
