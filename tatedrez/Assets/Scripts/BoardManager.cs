@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
@@ -74,7 +75,7 @@ public class BoardManager : MonoBehaviour
         {
             if (CheckMatch())
             {
-                Debug.Log(currentPlayerColor + " wins!");
+                EndGame();
             }
         }
 
@@ -83,6 +84,25 @@ public class BoardManager : MonoBehaviour
         ChangePlayerTurn();
 
         endTurnEvent.Invoke();
+    }
+
+    private void EndGame(bool tie = false)
+    {
+        if(!tie)
+        {
+            Debug.Log(currentPlayerColor + " wins!");
+        }
+        else
+        {
+            Debug.Log("No more moves! It's a tie!");
+        }
+
+        Invoke(nameof(ResetGame), 5.0f);
+    }
+
+    private void ResetGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private void ChangeGamePhase()
@@ -108,7 +128,7 @@ public class BoardManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("No more moves! It's a tie!");
+            EndGame(true);
         }
     }
 
