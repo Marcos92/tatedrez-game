@@ -21,19 +21,27 @@ public class BoardManager : MonoBehaviour
         WHITE,
         BLACK
     }
-    public PlayerColor currentPlayerColor;
+    [HideInInspector] public PlayerColor currentPlayerColor;
 
     public enum Phase
     {
         TICTACTOE,
         CHESS
     }
-    public Phase currentPhase;
+    [HideInInspector] public Phase currentPhase;
 
     private int turnCounter;
-    public UnityEvent endTurnEvent;
-
     private bool[] validMoves;
+
+    [HideInInspector] public UnityEvent endTurnEvent;
+    [HideInInspector] public UnityEvent endGameEvent;
+
+    public GameObject blur;
+
+    public GameObject whiteTurnLabel;
+    public GameObject blackTurnLabel;
+    public GameObject whiteNoMovesLabel;
+    public GameObject blackNoMovesLabel;
 
     public static BoardManager Instance { get; private set; }
     private void Awake()
@@ -55,7 +63,8 @@ public class BoardManager : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
         grid = GetComponent<GridLayoutGroup>();
         grid.constraintCount = boardSize;
-        grid.cellSize = new Vector2(rectTransform.rect.width / boardSize, rectTransform.rect.height / boardSize);
+        float size = rectTransform.rect.width / boardSize - grid.padding.left * 2 / boardSize;
+        grid.cellSize = new Vector2(size, size);
 
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
@@ -67,6 +76,8 @@ public class BoardManager : MonoBehaviour
 
         currentPlayerColor = PlayerColor.WHITE;
         currentPhase = Phase.TICTACTOE;
+
+        whiteTurnLabel.SetActive(true);
     }
 
     public void EndTurn()
@@ -76,8 +87,12 @@ public class BoardManager : MonoBehaviour
             if (CheckMatch())
             {
                 EndGame();
+                return;
             }
         }
+        
+        whiteNoMovesLabel.SetActive(false);
+        blackNoMovesLabel.SetActive(false);
 
         ChangeGamePhase();
 
@@ -88,7 +103,7 @@ public class BoardManager : MonoBehaviour
 
     private void EndGame(bool tie = false)
     {
-        if(!tie)
+        if (!tie)
         {
             Debug.Log(currentPlayerColor + " wins!");
         }
@@ -96,6 +111,10 @@ public class BoardManager : MonoBehaviour
         {
             Debug.Log("No more moves! It's a tie!");
         }
+
+        blur.SetActive(true);
+
+        endGameEvent.Invoke();
 
         Invoke(nameof(ResetGame), 5.0f);
     }
@@ -124,12 +143,17 @@ public class BoardManager : MonoBehaviour
         }
         else if (CheckIfPlayerHasValidMoves(currentPlayerColor))
         {
-            Debug.Log(otherPlayerColor + " has no valid moves! " + currentPlayerColor + " can play again!");
+            whiteNoMovesLabel.SetActive(otherPlayerColor == PlayerColor.WHITE);
+            blackNoMovesLabel.SetActive(otherPlayerColor == PlayerColor.BLACK);
         }
         else
         {
             EndGame(true);
+            return;
         }
+
+        whiteTurnLabel.SetActive(currentPlayerColor == PlayerColor.WHITE);
+        blackTurnLabel.SetActive(currentPlayerColor == PlayerColor.BLACK);
     }
 
     private bool CheckMatch()

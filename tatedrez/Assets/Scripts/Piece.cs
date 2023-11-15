@@ -14,8 +14,6 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     }
     public Type type;
 
-    public Sprite[] sprites;
-
     private Transform oldParent;
     private Transform newParent;
 
@@ -24,10 +22,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     void Start()
     {
         image = GetComponent<Image>();
-        image.sprite = sprites[(int)type + (int)playerColor * 3];
         image.raycastTarget = false;
 
         BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
+        BoardManager.Instance.endGameEvent.AddListener(Disable);
         UpdateState();
     }
 
@@ -88,5 +86,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS;
 
         image.raycastTarget = isPlayerTurn && (isValidForTictactoe || isValidForChess);
+    }
+
+    private void Disable()
+    {
+        image.raycastTarget = false;
     }
 }

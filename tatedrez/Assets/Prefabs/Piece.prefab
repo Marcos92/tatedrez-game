@@ -37,7 +37,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 120}
+  m_SizeDelta: {x: 100, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8883823798412952405
 CanvasRenderer:
@@ -89,13 +89,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd9478fc7163ad47bc71288f80f697a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: 1
+  playerColor: 0
   type: 0
   sprites:
-  - {fileID: 156520403, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  - {fileID: -1514326357, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  - {fileID: 449496752, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  - {fileID: -718259344, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  - {fileID: -1366495447, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  - {fileID: 964707560, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
-  image: {fileID: 8883823798412952406}
+  - {fileID: 1426533711, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
+  - {fileID: 1175288984, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
+  - {fileID: 1964484012, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
+  - {fileID: 1023416972, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
+  - {fileID: 524466809, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
+  - {fileID: -166927545, guid: c45432bb315f61d439d062f6b721e9e9, type: 3}
