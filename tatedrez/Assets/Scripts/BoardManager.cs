@@ -227,148 +227,33 @@ public class BoardManager : MonoBehaviour
 
     private void CheckRookValidMoves(int index)
     {
-        int verticalMove = boardSize;
-        int horizontalMove = 1;
-
-        int upLimit = 0;
-        int downLimit = (int)Mathf.Pow(boardSize, 2);
-        int leftLimit = boardSize * (GetRow(index) + 1) - boardSize - 1;
-        int rightLimit = boardSize * (GetRow(index) + 1);
-
-        //Up
-        for (int i = index - verticalMove; i >= upLimit; i -= verticalMove)
+        for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if (!board[i].HasPiece())
+            if(!board[i].HasPiece() && index != i && (IsOnSameColumn(index, i) || IsOnSameRow(index, i)))
             {
                 validMoves[i] = true;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        //Down
-        for (int i = index + verticalMove; i < downLimit; i += verticalMove)
-        {
-            if (!board[i].HasPiece())
-            {
-                validMoves[i] = true;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        //Left
-        for (int i = index - horizontalMove; i > leftLimit; i -= horizontalMove)
-        {
-            if (!board[i].HasPiece())
-            {
-                validMoves[i] = true;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        //Right
-        for (int i = index + horizontalMove; i < rightLimit; i += horizontalMove)
-        {
-            if (!board[i].HasPiece())
-            {
-                validMoves[i] = true;
-            }
-            else
-            {
-                break;
             }
         }
     }
 
     private void CheckBishopValidMoves(int index)
     {
-        int leftDiagonalMove = boardSize + 1;
-        int rightDiagonalMove = boardSize - 1;
-
-        //Up-Left
-        if (GetColumn(index) > 0 && GetRow(index) > 0)
+        for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            for (int i = index - leftDiagonalMove; i >= 0; i -= leftDiagonalMove)
+            if(!board[i].HasPiece() && index % 2 == i % 2 && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i))
             {
-                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
-                {
-                    validMoves[i] = true;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        //Down-Right
-        if (GetColumn(index) < boardSize - 1 && GetRow(index) < boardSize - 1)
-        {
-            for (int i = index + leftDiagonalMove; i < (int)Mathf.Pow(boardSize, 2); i += leftDiagonalMove)
-            {
-                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
-                {
-                    validMoves[i] = true;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        //Up-Right
-        if (GetColumn(index) < boardSize - 1 && GetRow(index) > 0)
-        {
-            for (int i = index - rightDiagonalMove; i >= 0; i -= rightDiagonalMove)
-            {
-                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
-                {
-                    validMoves[i] = true;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        //Down-Left
-        if (GetColumn(index) > 0 && GetRow(index) < boardSize - 1)
-        {
-            for (int i = index + rightDiagonalMove; i < (int)Mathf.Pow(boardSize, 2); i += rightDiagonalMove)
-            {
-                if (!board[i].HasPiece() && !IsOnSameRow(index, i) && !IsOnSameColumn(index, i))
-                {
-                    validMoves[i] = true;
-                }
-                else
-                {
-                    break;
-                }
+                validMoves[i] = true;
             }
         }
     }
 
     private void CheckKnightValidMoves(int index)
     {
-        int[] moves = { -(boardSize - 2), -(boardSize * 2 - 1), -(boardSize * 2 + 1), boardSize - 2, boardSize * 2 - 1, boardSize * 2 + 1 };
-
-        for (int i = 0; i < moves.Length; i++)
+        for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            int newIndex = index + moves[i];
-            if (newIndex >= 0 && newIndex < (int)Mathf.Pow(boardSize, 2) && !board[newIndex].HasPiece()
-            && !IsOnSameColumn(index, newIndex) && !IsOnSameRow(index, newIndex))
+            if(!board[i].HasPiece() && index % 2 != i % 2 && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i))
             {
-                validMoves[newIndex] = true;
+                validMoves[i] = true;
             }
         }
     }
