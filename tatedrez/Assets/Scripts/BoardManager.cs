@@ -1,13 +1,18 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     public BoardTile tilePrefab;
     private BoardTile[] board;
     private const int boardSize = 3;
-    public Color[] boardColors;
+    public Color lightColor;
+    public Color darkColor;
+
+    private RectTransform rectTransform;
+    private GridLayoutGroup grid;
 
     public enum PlayerColor
     {
@@ -45,24 +50,21 @@ public class BoardManager : MonoBehaviour
     {
         board = new BoardTile[(int)Mathf.Pow(boardSize, 2)];
 
+        rectTransform = GetComponent<RectTransform>();
+        grid = GetComponent<GridLayoutGroup>();
+        grid.constraintCount = boardSize;
+        grid.cellSize = new Vector2(rectTransform.rect.width / boardSize, rectTransform.rect.height / boardSize);
+
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            int x = GetColumn(i) - 1;
-            int y = GetRow(i) - 1;
-
             board[i] = Instantiate(tilePrefab, transform);
-            RectTransform rectTransform = board[i].GetComponent<RectTransform>();
-            float size = rectTransform.rect.width;
-            rectTransform.localPosition = new Vector2(x * size, -y * size);
-
-            board[i].SetColor(boardColors[i % 2]);
-
+            board[i].SetColor((GetRow(i) % 2) == (GetColumn(i) % 2) ? lightColor : darkColor);
             board[i].SetLabel(i.ToString());
             board[i].gameObject.name = "TILE " + i;
         }
 
         currentPlayerColor = PlayerColor.WHITE;
-        currentPhase = Phase.TICTACTOE;
+        currentPhase = Phase.CHESS;
     }
 
     public void EndTurn()
@@ -80,6 +82,13 @@ public class BoardManager : MonoBehaviour
             currentPhase = Phase.CHESS;
         }
 
+        //ChangePlayerTurn();
+
+        endTurnEvent.Invoke();
+    }
+
+    private void ChangePlayerTurn()
+    {
         if (currentPlayerColor == PlayerColor.WHITE)
         {
             currentPlayerColor = PlayerColor.BLACK;
@@ -88,8 +97,6 @@ public class BoardManager : MonoBehaviour
         {
             currentPlayerColor = PlayerColor.WHITE;
         }
-
-        endTurnEvent.Invoke();
     }
 
     private bool CheckMatch()
@@ -172,7 +179,7 @@ public class BoardManager : MonoBehaviour
 
     public void CheckValidMoves(BoardTile tile)
     {
-        if(currentPhase != Phase.CHESS)
+        if (currentPhase != Phase.CHESS)
             return;
 
         int index = Array.IndexOf(board, tile);
@@ -214,7 +221,7 @@ public class BoardManager : MonoBehaviour
 
     public void ResetValidMoves()
     {
-        if(currentPhase != Phase.CHESS)
+        if (currentPhase != Phase.CHESS)
             return;
 
         validMoves = new bool[board.Length];
@@ -229,7 +236,9 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if(!board[i].HasPiece() && index != i && (IsOnSameColumn(index, i) || IsOnSameRow(index, i)))
+            bool validRow = IsOnSameRow(index, i) && !IsPieceBetweenRow(index, i);
+            bool validColumn = IsOnSameColumn(index, i) && !IsPieceBetweenColumn(index, i);
+            if (!board[i].HasPiece() && index != i && (validColumn || validRow))
             {
                 validMoves[i] = true;
             }
@@ -240,7 +249,8 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if(!board[i].HasPiece() && index % 2 == i % 2 && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i))
+            bool validDiagonal = IsDiagonal(index, i) && !IsPieceBetweenDiagonal(index, i);
+            if (!board[i].HasPiece() && validDiagonal)
             {
                 validMoves[i] = true;
             }
@@ -251,7 +261,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if(!board[i].HasPiece() && index % 2 != i % 2 && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i))
+            if (!board[i].HasPiece() && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i) && IsInKnightRange(index, i) && !IsDiagonal(index, i))
             {
                 validMoves[i] = true;
             }
@@ -276,5 +286,69 @@ public class BoardManager : MonoBehaviour
     private bool IsOnSameColumn(int a, int b)
     {
         return GetColumn(a) == GetColumn(b);
+    }
+
+    private bool IsDiagonal(int a, int b)
+    {
+        return Mathf.Abs(GetRow(a) - GetRow(b)) == Mathf.Abs(GetColumn(a) - GetColumn(b));
+    }
+
+    private bool IsInKnightRange(int a, int b)
+    {
+        return Mathf.Abs(GetRow(a) - GetRow(b)) < 3 && Mathf.Abs(GetColumn(a) - GetColumn(b)) < 3;
+    }
+
+    private bool IsPieceBetweenRow(int a, int b)
+    {
+        int direction = 1;
+        int first = Mathf.Min(a, b) + direction;
+        int last = Mathf.Max(a, b);
+
+        for(int i = first; i < last; i += direction)
+        {
+            if(board[i].HasPiece())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsPieceBetweenColumn(int a, int b)
+    {
+        int direction = boardSize;
+        int first = Mathf.Min(a, b) + direction;
+        int last = Mathf.Max(a, b);
+
+        for(int i = first; i < last; i += direction)
+        {
+            if(board[i].HasPiece())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsPieceBetweenDiagonal(int a, int b)
+    {
+        int top = Mathf.Min(a, b);
+        int bottom = Mathf.Max(a, b);
+
+        bool topLeftDiagonal = GetColumn(top) < GetColumn(bottom); //Otherwise we have a top-right diagonal
+        int direction = boardSize + (topLeftDiagonal ? 1 : -1);
+        top += direction;
+
+        for(int i = top; i < bottom; i += direction)
+        {
+            if(board[i].HasPiece())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
