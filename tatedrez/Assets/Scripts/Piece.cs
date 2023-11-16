@@ -17,10 +17,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     private Transform oldParent;
     private Transform newParent;
 
-
     [Header("Visuals")]
     public Image image;
     public GameObject glow;
+    public GameObject shadow;
 
     private AudioSource audioSource;
 
@@ -51,6 +51,9 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         transform.SetAsLastSibling();
 
         audioSource.Play();
+
+        shadow.SetActive(false);
+
         Disable();
     }
 
@@ -81,6 +84,8 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
             Enable();
         }
+
+        shadow.SetActive(true);
 
         BoardManager.Instance.ResetValidMoves();
     }
