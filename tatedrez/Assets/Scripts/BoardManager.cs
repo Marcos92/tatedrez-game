@@ -407,8 +407,8 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            bool validRow = IsOnSameRow(index, i) && !IsPieceBetweenRow(index, i);
-            bool validColumn = IsOnSameColumn(index, i) && !IsPieceBetweenColumn(index, i);
+            bool validRow = IsOnSameRow(index, i) && !IsPieceBlockingRow(index, i);
+            bool validColumn = IsOnSameColumn(index, i) && !IsPieceBlockingColumn(index, i);
             if (!board[i].HasPiece() && index != i && (validColumn || validRow))
             {
                 validMoves[i] = true;
@@ -420,7 +420,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            bool validDiagonal = IsOnSameDiagonal(index, i) && !IsPieceBetweenDiagonal(index, i);
+            bool validDiagonal = IsOnSameDiagonal(index, i) && !IsPieceBlockingDiagonal(index, i);
             if (!board[i].HasPiece() && validDiagonal)
             {
                 validMoves[i] = true;
@@ -432,7 +432,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if (!board[i].HasPiece() && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i) && IsInKnightRange(index, i) && !IsOnSameDiagonal(index, i))
+            if (!board[i].HasPiece() && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i) && !IsOnSameDiagonal(index, i) && IsInKnightRange(index, i))
             {
                 validMoves[i] = true;
             }
@@ -466,10 +466,10 @@ public class BoardManager : MonoBehaviour
 
     private bool IsInKnightRange(int a, int b)
     {
-        return Mathf.Abs(GetRow(a) - GetRow(b)) < 3 && Mathf.Abs(GetColumn(a) - GetColumn(b)) < 3;
+        return Mathf.Abs(GetRow(a) - GetRow(b)) <= 2 && Mathf.Abs(GetColumn(a) - GetColumn(b)) <= 2;
     }
 
-    private bool IsPieceBetweenRow(int a, int b)
+    private bool IsPieceBlockingRow(int a, int b)
     {
         int direction = 1;
         int first = Mathf.Min(a, b) + direction;
@@ -486,7 +486,7 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    private bool IsPieceBetweenColumn(int a, int b)
+    private bool IsPieceBlockingColumn(int a, int b)
     {
         int direction = boardSize;
         int first = Mathf.Min(a, b) + direction;
@@ -503,7 +503,7 @@ public class BoardManager : MonoBehaviour
         return false;
     }
 
-    private bool IsPieceBetweenDiagonal(int a, int b)
+    private bool IsPieceBlockingDiagonal(int a, int b)
     {
         int top = Mathf.Min(a, b);
         int bottom = Mathf.Max(a, b);
