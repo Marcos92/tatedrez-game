@@ -2258,6 +2258,7 @@ MonoBehaviour:
   blackTieLabel: {fileID: 1225637379}
   sfxGameMode: {fileID: 8300000, guid: 026799da803b1004d8c36788108d1fb3, type: 3}
   sfxEndGame: {fileID: 8300000, guid: ffa6469e53024c440b743318ce873206, type: 3}
+  sfxNoMoves: {fileID: 8300000, guid: 8f5700bc07cd68d43a4102b59256a076, type: 3}
 --- !u!114 &1499557915
 MonoBehaviour:
   m_ObjectHideFlags: 0

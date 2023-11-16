@@ -56,6 +56,7 @@ public class BoardManager : MonoBehaviour
     [Header("Audio")]
     public AudioClip sfxGameMode;
     public AudioClip sfxEndGame;
+    public AudioClip sfxNoMoves;
     private AudioSource audioSource;
 
     public static BoardManager Instance { get; private set; }
@@ -220,6 +221,9 @@ public class BoardManager : MonoBehaviour
         {
             whiteNoMovesLabel.SetActive(otherPlayerColor == PlayerColor.WHITE);
             blackNoMovesLabel.SetActive(otherPlayerColor == PlayerColor.BLACK);
+
+            audioSource.clip = sfxNoMoves;
+            audioSource.Play();
         }
         else
         {
