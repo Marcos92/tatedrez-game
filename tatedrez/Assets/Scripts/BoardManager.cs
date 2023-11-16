@@ -126,7 +126,7 @@ public class BoardManager : MonoBehaviour
     private void StartTicTacToe()
     {
         currentPlayerColor = Random.Range(0, 2) > 0 ? PlayerColor.WHITE : PlayerColor.BLACK;
-        
+
         startGameEvent.Invoke();
 
         blur.SetActive(false);
@@ -420,7 +420,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            bool validDiagonal = IsDiagonal(index, i) && !IsPieceBetweenDiagonal(index, i);
+            bool validDiagonal = IsOnSameDiagonal(index, i) && !IsPieceBetweenDiagonal(index, i);
             if (!board[i].HasPiece() && validDiagonal)
             {
                 validMoves[i] = true;
@@ -432,7 +432,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < Mathf.Pow(boardSize, 2); i++)
         {
-            if (!board[i].HasPiece() && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i) && IsInKnightRange(index, i) && !IsDiagonal(index, i))
+            if (!board[i].HasPiece() && !IsOnSameColumn(index, i) && !IsOnSameRow(index, i) && IsInKnightRange(index, i) && !IsOnSameDiagonal(index, i))
             {
                 validMoves[i] = true;
             }
@@ -459,7 +459,7 @@ public class BoardManager : MonoBehaviour
         return GetColumn(a) == GetColumn(b);
     }
 
-    private bool IsDiagonal(int a, int b)
+    private bool IsOnSameDiagonal(int a, int b)
     {
         return Mathf.Abs(GetRow(a) - GetRow(b)) == Mathf.Abs(GetColumn(a) - GetColumn(b));
     }
