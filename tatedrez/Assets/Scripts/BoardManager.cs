@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -33,6 +32,7 @@ public class BoardManager : MonoBehaviour
     private int turnCounter;
     private bool[] validMoves;
 
+    [HideInInspector] public UnityEvent startGameEvent;
     [HideInInspector] public UnityEvent endTurnEvent;
     [HideInInspector] public UnityEvent endGameEvent;
 
@@ -76,6 +76,11 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
+        SetupBoard();
+        PreparePhase(Phase.TICTACTOE);
+    }
+    private void SetupBoard()
+    {
         board = new BoardTile[(int)Mathf.Pow(boardSize, 2)];
 
         rectTransform = GetComponent<RectTransform>();
@@ -91,9 +96,6 @@ public class BoardManager : MonoBehaviour
             board[i].SetLabel(i.ToString());
             board[i].gameObject.name = "TILE " + i;
         }
-
-        currentPlayerColor = PlayerColor.WHITE;
-        PreparePhase(Phase.TICTACTOE);
     }
 
     private void PreparePhase(Phase phase)
@@ -120,11 +122,17 @@ public class BoardManager : MonoBehaviour
 
     private void StartTicTacToe()
     {
+        currentPlayerColor = Random.Range(0, 2) > 0 ? PlayerColor.WHITE : PlayerColor.BLACK;
+        
+        startGameEvent.Invoke();
+
         blur.SetActive(false);
+
         blackTictactoeLabel.SetActive(false);
         whiteTictactoeLabel.SetActive(false);
 
-        whiteTurnLabel.SetActive(true);
+        whiteTurnLabel.SetActive(currentPlayerColor == PlayerColor.WHITE);
+        blackTurnLabel.SetActive(currentPlayerColor == PlayerColor.BLACK);
     }
 
     private void StartChess()
@@ -321,7 +329,7 @@ public class BoardManager : MonoBehaviour
         if (currentPhase != Phase.CHESS)
             return false;
 
-        int index = Array.IndexOf(board, tile);
+        int index = System.Array.IndexOf(board, tile);
         Piece.Type type = tile.GetPiece().type;
         validMoves = new bool[board.Length];
 

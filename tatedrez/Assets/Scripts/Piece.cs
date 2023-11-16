@@ -30,10 +30,9 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
         audioSource = GetComponent<AudioSource>();
 
+        BoardManager.Instance.startGameEvent.AddListener(UpdateState);
         BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
         BoardManager.Instance.endGameEvent.AddListener(Disable);
-
-        UpdateState();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
