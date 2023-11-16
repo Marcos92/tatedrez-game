@@ -19,6 +19,8 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     private Image image;
 
+    private bool draggable;
+
     void Start()
     {
         image = GetComponent<Image>();
@@ -34,9 +36,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         oldParent = transform.parent;
         newParent = transform.parent;
 
+        draggable = true;
         if (transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
         {
-            BoardManager.Instance.CheckIfPieceHasValidMoves(tile, true);
+            draggable = BoardManager.Instance.CheckIfPieceHasValidMoves(tile, true);
         }
 
         //Places the piece above everything on the hierarchy
@@ -47,7 +50,10 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = Input.mousePosition;
+        if(draggable)
+        {
+            transform.position = Input.mousePosition;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -57,6 +63,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
             if (oldParent.TryGetComponent<BoardTile>(out BoardTile tile))
             {
                 tile.RemovePiece();
+                tile.FadeOutAllHighlights();
             }
 
             transform.SetParent(newParent);

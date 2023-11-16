@@ -13,7 +13,6 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public Image hoverImage;
     public Image validMoveImage;
     public float highlightFadeInSpeed;
-    public float highlightFadeOutSpeed;
 
     private Piece piece;
 
@@ -42,40 +41,37 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnDrop(PointerEventData eventData)
     {
-        if(!interactable)
+        if (!interactable)
             return;
-        
-        if(!HasPiece())
+
+        if (!HasPiece())
         {
             GameObject drop = eventData.pointerDrag;
             Piece p = drop.GetComponent<Piece>();
             p.SetNewParent(transform);
             piece = p;
-            StartCoroutine(FadeOutHighlight(hoverImage));
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(!interactable)
+        if (!interactable)
             return;
 
         if (!HasPiece())
         {
-            StopAllCoroutines();
             StartCoroutine(FadeInHighlight(hoverImage));
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        StopAllCoroutines();
-        StartCoroutine(FadeOutHighlight(hoverImage));
+        FadeOutHighlight(hoverImage);
     }
 
     private IEnumerator FadeInHighlight(Image image)
     {
-        while (image.color.a < 0.75f)
+        while (image.color.a < 0.5f)
         {
             float alpha = image.color.a;
             alpha += highlightFadeInSpeed * Time.deltaTime;
@@ -84,15 +80,10 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
     }
 
-    private IEnumerator FadeOutHighlight(Image image)
+    private void FadeOutHighlight(Image image)
     {
-        while (image.color.a > 0.0f)
-        {
-            float alpha = image.color.a;
-            alpha -= highlightFadeOutSpeed * Time.deltaTime;
-            image.color = new Color(image.color.r, image.color.g, image.color.b, alpha);
-            yield return null;
-        }
+        StopAllCoroutines();
+        image.color = new Color(image.color.r, image.color.g, image.color.b, 0.0f);
     }
 
     public bool HasPiece()
@@ -122,11 +113,17 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void HideValidMove()
     {
-        StartCoroutine(FadeOutHighlight(validMoveImage));
+        FadeOutHighlight(validMoveImage);
     }
 
     public void ToggleInteraction(bool value)
     {
         interactable = value;
+    }
+
+    public void FadeOutAllHighlights()
+    {
+        FadeOutHighlight(hoverImage);
+        FadeOutHighlight(validMoveImage);
     }
 }

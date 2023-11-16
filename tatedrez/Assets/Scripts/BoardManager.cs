@@ -90,13 +90,15 @@ public class BoardManager : MonoBehaviour
                 return;
             }
         }
-        
+
         whiteNoMovesLabel.SetActive(false);
         blackNoMovesLabel.SetActive(false);
 
         ChangeGamePhase();
 
         ChangePlayerTurn();
+
+        ResetValidMoves();
 
         endTurnEvent.Invoke();
     }
@@ -306,7 +308,7 @@ public class BoardManager : MonoBehaviour
         for (int i = 0; i < validMoves.Length; i++)
         {
             board[i].ToggleInteraction(true);
-            board[i].HideValidMove();
+            board[i].FadeOutAllHighlights();
         }
     }
 
