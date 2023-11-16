@@ -93,7 +93,7 @@ public class BoardManager : MonoBehaviour
         currentPhase = phase;
         blur.SetActive(true);
 
-        if(phase == Phase.TICTACTOE)
+        if (phase == Phase.TICTACTOE)
         {
             blackTictactoeLabel.SetActive(true);
             whiteTictactoeLabel.SetActive(true);
@@ -143,7 +143,7 @@ public class BoardManager : MonoBehaviour
         ChangeGamePhase();
 
         //Avoid showing "your turn" label during phase transition, StartChess method will handle the player turn switch
-        if(lastPhase == currentPhase)
+        if (lastPhase == currentPhase)
         {
             PostEndTurn();
         }
@@ -160,11 +160,15 @@ public class BoardManager : MonoBehaviour
     {
         if (!tie)
         {
-            Debug.Log(currentPlayerColor + " wins!");
+            whiteWinLabel.SetActive(currentPlayerColor == PlayerColor.WHITE);
+            blackWinLabel.SetActive(currentPlayerColor == PlayerColor.BLACK);
+            whiteLoseLabel.SetActive(currentPlayerColor != PlayerColor.WHITE);
+            blackLoseLabel.SetActive(currentPlayerColor != PlayerColor.BLACK);
         }
         else
         {
-            Debug.Log("No more moves! It's a tie!");
+            whiteTieLabel.SetActive(true);
+            blackTieLabel.SetActive(true);
         }
 
         blur.SetActive(true);
@@ -183,7 +187,7 @@ public class BoardManager : MonoBehaviour
     {
         if (turnCounter >= boardSize * 2)
         {
-            if(currentPhase == Phase.TICTACTOE)
+            if (currentPhase == Phase.TICTACTOE)
             {
                 PreparePhase(Phase.CHESS);
             }
