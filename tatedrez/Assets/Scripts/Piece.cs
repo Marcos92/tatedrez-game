@@ -22,12 +22,17 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     public Image image;
     public GameObject glow;
 
+    private AudioSource audioSource;
+
     void Start()
     {
         image.raycastTarget = false;
 
+        audioSource = GetComponent<AudioSource>();
+
         BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
         BoardManager.Instance.endGameEvent.AddListener(Disable);
+
         UpdateState();
     }
 
@@ -45,6 +50,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         transform.SetParent(transform.root);
         transform.SetAsLastSibling();
 
+        audioSource.Play();
         Disable();
     }
 

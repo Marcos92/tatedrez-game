@@ -53,6 +53,11 @@ public class BoardManager : MonoBehaviour
     public GameObject whiteTieLabel;
     public GameObject blackTieLabel;
 
+    [Header("Audio")]
+    public AudioClip sfxGameMode;
+    public AudioClip sfxEndGame;
+    private AudioSource audioSource;
+
     public static BoardManager Instance { get; private set; }
     private void Awake()
     {
@@ -64,6 +69,8 @@ public class BoardManager : MonoBehaviour
         {
             Instance = this;
         }
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -92,6 +99,9 @@ public class BoardManager : MonoBehaviour
     {
         currentPhase = phase;
         blur.SetActive(true);
+
+        audioSource.clip = sfxGameMode;
+        audioSource.Play();
 
         if (phase == Phase.TICTACTOE)
         {
@@ -172,6 +182,9 @@ public class BoardManager : MonoBehaviour
         }
 
         blur.SetActive(true);
+
+        audioSource.clip = sfxEndGame;
+        audioSource.Play();
 
         endGameEvent.Invoke();
 

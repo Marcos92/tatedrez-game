@@ -18,10 +18,14 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private bool interactable;
 
+    private AudioSource audioSource;
+
     void Awake()
     {
         tileImage = GetComponent<Image>();
         debugLabel = GetComponentInChildren<TMP_Text>();
+
+        audioSource = GetComponent<AudioSource>();
 
         interactable = true;
     }
@@ -50,6 +54,8 @@ public class BoardTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             Piece p = drop.GetComponent<Piece>();
             p.SetNewParent(transform);
             piece = p;
+
+            audioSource.Play();
         }
     }
 
