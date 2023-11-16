@@ -88,7 +88,7 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     {
         bool isPlayerTurn = playerColor == BoardManager.Instance.currentPlayerColor;
         bool isValidForTictactoe = BoardManager.Instance.currentPhase == BoardManager.Phase.TICTACTOE && !transform.parent.GetComponent<BoardTile>();
-        bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS && BoardManager.Instance.CheckIfPieceHasValidMoves(transform.parent.GetComponent<BoardTile>(), true);
+        bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS && BoardManager.Instance.CheckIfPieceHasValidMoves(transform.parent.GetComponent<BoardTile>());
 
         bool interactable = isPlayerTurn && (isValidForTictactoe || isValidForChess);
         image.raycastTarget = interactable;

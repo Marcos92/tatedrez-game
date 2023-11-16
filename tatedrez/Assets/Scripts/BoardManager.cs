@@ -36,12 +36,22 @@ public class BoardManager : MonoBehaviour
     [HideInInspector] public UnityEvent endTurnEvent;
     [HideInInspector] public UnityEvent endGameEvent;
 
+    [Header("UI")]
     public GameObject blur;
-
     public GameObject whiteTurnLabel;
     public GameObject blackTurnLabel;
     public GameObject whiteNoMovesLabel;
     public GameObject blackNoMovesLabel;
+    public GameObject whiteWinLabel;
+    public GameObject blackWinLabel;
+    public GameObject whiteLoseLabel;
+    public GameObject blackLoseLabel;
+    public GameObject whiteChessLabel;
+    public GameObject blackChessLabel;
+    public GameObject whiteTictactoeLabel;
+    public GameObject blackTictactoeLabel;
+    public GameObject whiteTieLabel;
+    public GameObject blackTieLabel;
 
     public static BoardManager Instance { get; private set; }
     private void Awake()
@@ -75,9 +85,44 @@ public class BoardManager : MonoBehaviour
         }
 
         currentPlayerColor = PlayerColor.WHITE;
-        currentPhase = Phase.TICTACTOE;
+        PreparePhase(Phase.TICTACTOE);
+    }
+
+    private void PreparePhase(Phase phase)
+    {
+        currentPhase = phase;
+        blur.SetActive(true);
+
+        if(phase == Phase.TICTACTOE)
+        {
+            blackTictactoeLabel.SetActive(true);
+            whiteTictactoeLabel.SetActive(true);
+            Invoke(nameof(StartTicTacToe), 3.0f);
+        }
+        else
+        {
+            blackChessLabel.SetActive(true);
+            whiteChessLabel.SetActive(true);
+            Invoke(nameof(StartChess), 3.0f);
+        }
+    }
+
+    private void StartTicTacToe()
+    {
+        blur.SetActive(false);
+        blackTictactoeLabel.SetActive(false);
+        whiteTictactoeLabel.SetActive(false);
 
         whiteTurnLabel.SetActive(true);
+    }
+
+    private void StartChess()
+    {
+        blur.SetActive(false);
+        blackChessLabel.SetActive(false);
+        whiteChessLabel.SetActive(false);
+
+        PostEndTurn();
     }
 
     public void EndTurn()
@@ -94,12 +139,20 @@ public class BoardManager : MonoBehaviour
         whiteNoMovesLabel.SetActive(false);
         blackNoMovesLabel.SetActive(false);
 
+        Phase lastPhase = currentPhase;
         ChangeGamePhase();
 
+        //Avoid showing "your turn" label during phase transition, StartChess method will handle the player turn switch
+        if(lastPhase == currentPhase)
+        {
+            PostEndTurn();
+        }
+    }
+
+    private void PostEndTurn()
+    {
         ChangePlayerTurn();
-
         ResetValidMoves();
-
         endTurnEvent.Invoke();
     }
 
@@ -130,7 +183,10 @@ public class BoardManager : MonoBehaviour
     {
         if (turnCounter >= boardSize * 2)
         {
-            currentPhase = Phase.CHESS;
+            if(currentPhase == Phase.TICTACTOE)
+            {
+                PreparePhase(Phase.CHESS);
+            }
             validMoves = new bool[board.Length];
         }
     }
@@ -154,6 +210,9 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
+        //Set false first to reset animation
+        whiteTurnLabel.SetActive(false);
+        blackTurnLabel.SetActive(false);
         whiteTurnLabel.SetActive(currentPlayerColor == PlayerColor.WHITE);
         blackTurnLabel.SetActive(currentPlayerColor == PlayerColor.BLACK);
     }
