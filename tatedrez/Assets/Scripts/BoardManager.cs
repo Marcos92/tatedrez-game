@@ -72,6 +72,9 @@ public class BoardManager : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
+
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
     }
 
     void Start()
