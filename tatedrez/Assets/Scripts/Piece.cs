@@ -17,13 +17,13 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     private Transform oldParent;
     private Transform newParent;
 
-    private Image image;
 
-    private bool draggable;
+    [Header("Visuals")]
+    public Image image;
+    public GameObject glow;
 
     void Start()
     {
-        image = GetComponent<Image>();
         image.raycastTarget = false;
 
         BoardManager.Instance.endTurnEvent.AddListener(UpdateState);
@@ -36,24 +36,21 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         oldParent = transform.parent;
         newParent = transform.parent;
 
-        draggable = true;
         if (transform.parent.TryGetComponent<BoardTile>(out BoardTile tile))
         {
-            draggable = BoardManager.Instance.CheckIfPieceHasValidMoves(tile, true);
+            BoardManager.Instance.CheckIfPieceHasValidMoves(tile, true);
         }
 
         //Places the piece above everything on the hierarchy
         transform.SetParent(transform.root);
         transform.SetAsLastSibling();
-        image.raycastTarget = false;
+
+        Disable();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if(draggable)
-        {
-            transform.position = Input.mousePosition;
-        }
+        transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -75,7 +72,8 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
         {
             transform.SetParent(oldParent);
             transform.localPosition = Vector2.zero;
-            image.raycastTarget = true;
+
+            Enable();
         }
 
         BoardManager.Instance.ResetValidMoves();
@@ -89,14 +87,23 @@ public class Piece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHan
     private void UpdateState()
     {
         bool isPlayerTurn = playerColor == BoardManager.Instance.currentPlayerColor;
-        bool isValidForTictactoe = !transform.parent.GetComponent<BoardTile>() && BoardManager.Instance.currentPhase == BoardManager.Phase.TICTACTOE;
-        bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS;
+        bool isValidForTictactoe = BoardManager.Instance.currentPhase == BoardManager.Phase.TICTACTOE && !transform.parent.GetComponent<BoardTile>();
+        bool isValidForChess = BoardManager.Instance.currentPhase == BoardManager.Phase.CHESS && BoardManager.Instance.CheckIfPieceHasValidMoves(transform.parent.GetComponent<BoardTile>(), true);
 
-        image.raycastTarget = isPlayerTurn && (isValidForTictactoe || isValidForChess);
+        bool interactable = isPlayerTurn && (isValidForTictactoe || isValidForChess);
+        image.raycastTarget = interactable;
+        glow.SetActive(interactable && BoardManager.Instance.currentPlayerColor == playerColor);
+    }
+
+    private void Enable()
+    {
+        image.raycastTarget = true;
+        glow.SetActive(true);
     }
 
     private void Disable()
     {
         image.raycastTarget = false;
+        glow.SetActive(false);
     }
 }
