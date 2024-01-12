@@ -24,26 +24,23 @@ public class Piece : MonoBehaviour
         pieceInput.OnPieceDrag += Move;
         pieceInput.OnPieceEndDrag += EndMove;
 
-        GameEvents.StartTurn.AddListener(UpdateState);
-    }
+        GameEvents.StartTurn.AddListener(EnableInput);
+        GameEvents.EndTurn.AddListener(DisableInput);
 
-    private void UpdateState()
-    {
-        ToggleInteraction(CanMove());
+        GameEvents.StartTicTacToe.AddListener(DisableInput);
+        GameEvents.StartChess.AddListener(DisableInput);
+        GameEvents.EndGame.AddListener(DisableInput);
     }
 
     private bool CanMove()
     {
         bool isPlayerTurn = color == GameManager.Instance.CurrentPlayerColor;
-        bool isValidForTictactoe = GameManager.Instance.CurrentPhase == GamePhase.TICTACTOE && !tile;
-        bool isValidForChess = GameManager.Instance.CurrentPhase == GamePhase.CHESS && MoveValidation.CanPieceMove(this);
-        return isPlayerTurn && (isValidForTictactoe || isValidForChess);
+        return isPlayerTurn && GameManager.Instance.MoveValidation.CanPieceMove(this);
     }
 
     private void StartMove()
     {
         pieceMovement.StartMove();
-        pieceRenderer.ToggleGlow(false);
         pieceRenderer.ToggleShadow(false);
         pieceAudio.PlayPieceSelectedAudio();
 
@@ -59,20 +56,35 @@ public class Piece : MonoBehaviour
     {
         pieceMovement.EndMove();
         pieceRenderer.ToggleShadow(true);
-        pieceRenderer.ToggleGlow(CanMove());
 
         GameEvents.PieceRelease.Invoke();
     }
 
-    public void Drop(Tile tile)
+    public void DropOnTile(Tile newTile)
     {
-        this.tile = tile;
+        if (tile)
+        {
+            tile.RemovePiece();
+        }
+
+        tile = newTile;
+
         pieceMovement.Drop(tile.transform);
     }
 
-    private void ToggleInteraction(bool value)
+    private void ToggleInput(bool value)
     {
-        pieceInput.enabled = value;
+        pieceInput.ToggleInput(value);
         pieceRenderer.ToggleGlow(value);
+    }
+
+    private void EnableInput()
+    {
+        ToggleInput(CanMove());
+    }
+
+    private void DisableInput()
+    {
+        ToggleInput(false);
     }
 }

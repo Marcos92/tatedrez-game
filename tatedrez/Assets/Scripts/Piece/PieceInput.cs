@@ -27,4 +27,9 @@ public class PieceInput : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         OnPieceEndDrag.Invoke();
         image.raycastTarget = true;
     }
+
+    public void ToggleInput(bool value)
+    {
+        image.raycastTarget = value;
+    }
 }

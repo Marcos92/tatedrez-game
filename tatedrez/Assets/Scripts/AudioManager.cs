@@ -17,6 +17,8 @@ public class AudioManager : MonoBehaviour
 
         GameEvents.StartTicTacToe.AddListener(PlayStartPhaseAudio);
         GameEvents.StartChess.AddListener(PlayStartPhaseAudio);
+
+        GameEvents.NoMoves.AddListener(PlayNoMovesAudio);
     }
 
     private void PlayStartPhaseAudio()

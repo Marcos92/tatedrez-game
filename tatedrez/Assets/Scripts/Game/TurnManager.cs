@@ -27,6 +27,7 @@ public class TurnManager : MonoBehaviour
 
     public void EndTurn()
     {
+        GameEvents.EndTurn.Invoke();
         turnCount++;
     }
 }

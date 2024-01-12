@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     public PlayerColor OtherPlayerColor { get => turnManager.OtherPlayerColor; }
     public GamePhase CurrentPhase { get => phaseManager.CurrentPhase; }
 
+    private IMoveValidation moveValidation;
+    public IMoveValidation MoveValidation { get => moveValidation; }
+
     public static GameManager Instance { get; private set; }
     private void Awake()
     {
@@ -28,7 +31,8 @@ public class GameManager : MonoBehaviour
         turnManager = GetComponent<TurnManager>();
         phaseManager = GetComponent<PhaseManager>();
 
-        GameEvents.NextTurn.AddListener(NextTurn);
+        moveValidation = new TictactoeMoveValidation();
+
         GameEvents.PiecePlayed.AddListener(EndTurn);
     }
 
@@ -54,7 +58,7 @@ public class GameManager : MonoBehaviour
     {
         if (turnManager.TurnCount >= GameBoard.Instance.Size * 2 - 1)
         {
-            if (MatchValidation.FindMatch())
+            if (MatchValidation.FindMatch(turnManager.CurrentPlayerColor))
             {
                 EndGame();
             }
@@ -62,6 +66,7 @@ public class GameManager : MonoBehaviour
             {
                 CheckForPhaseChange();
             }
+
             return;
         }
 
@@ -75,6 +80,7 @@ public class GameManager : MonoBehaviour
             if (phaseManager.CurrentPhase == GamePhase.TICTACTOE)
             {
                 phaseManager.StartChess();
+                moveValidation = new ChessMoveValidation();
                 Invoke(nameof(NextTurn), 3.0f);
                 return;
             }
@@ -85,13 +91,14 @@ public class GameManager : MonoBehaviour
 
     private void NextTurn()
     {
-        if (MoveValidation.CanPlayerMove(turnManager.OtherPlayerColor))
+        if (moveValidation.CanPlayerMove(turnManager.OtherPlayerColor))
         {
             turnManager.ChangeTurn();
         }
-        else if (MoveValidation.CanPlayerMove(turnManager.CurrentPlayerColor))
+        else if (moveValidation.CanPlayerMove(turnManager.CurrentPlayerColor))
         {
             GameEvents.NoMoves.Invoke();
+            turnManager.StartTurn();
         }
         else
         {

@@ -47,7 +47,7 @@ public class Tile : MonoBehaviour
             return;
 
         this.piece = piece;
-        this.piece.Drop(this);
+        this.piece.DropOnTile(this);
 
         tileAudio.PlayTileDropSound();
 
@@ -59,18 +59,23 @@ public class Tile : MonoBehaviour
         return piece != null;
     }
 
+    public bool HasPieceOfColor(PlayerColor color)
+    {
+        return HasPiece() && piece.Color == color;
+    }
+
     public void RemovePiece()
     {
         piece = null;
     }
 
-    public void ToggleInteraction(bool value)
-    {
-        tileInput.enabled = value;
-    }
-
     public void ShowValidMoveHighlight()
     {
         tileRenderer.FadeInValidMove();
+    }
+
+    public void HideValidMoveHighlight()
+    {
+        tileRenderer.FadeOutValidMove();
     }
 }

@@ -27,6 +27,8 @@ public class UIManager : MonoBehaviour
 
         GameEvents.StartTicTacToe.AddListener(ShowTickTacToeUI);
         GameEvents.StartChess.AddListener(ShowChessUI);
+
+        GameEvents.NoMoves.AddListener(ShowNoMovesUI);
     }
 
     private void ShowTickTacToeUI()
@@ -52,9 +54,6 @@ public class UIManager : MonoBehaviour
 
         blackChessLabel.SetActive(false);
         whiteChessLabel.SetActive(false);
-
-        whiteNoMovesLabel.SetActive(false);
-        blackNoMovesLabel.SetActive(false);
 
         whiteTurnLabel.SetActive(false);
         blackTurnLabel.SetActive(false);
@@ -82,6 +81,8 @@ public class UIManager : MonoBehaviour
 
     private void ShowNoMovesUI()
     {
+        whiteNoMovesLabel.SetActive(false);
+        blackNoMovesLabel.SetActive(false);
         whiteNoMovesLabel.SetActive(GameManager.Instance.CurrentPlayerColor == PlayerColor.BLACK);
         blackNoMovesLabel.SetActive(GameManager.Instance.CurrentPlayerColor == PlayerColor.WHITE);
     }

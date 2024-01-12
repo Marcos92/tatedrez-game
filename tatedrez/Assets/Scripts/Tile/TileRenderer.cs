@@ -41,7 +41,7 @@ public class TileRenderer : MonoBehaviour
         StartCoroutine(FadeIn(validMoveImage));
     }
 
-    public void FadeOut(Image image)
+    private void FadeOut(Image image)
     {
         StopAllCoroutines();
         image.color = new Color(image.color.r, image.color.g, image.color.b, 0.0f);

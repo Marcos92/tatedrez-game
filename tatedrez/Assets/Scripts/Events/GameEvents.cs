@@ -6,7 +6,7 @@ public static class GameEvents
     public static UnityEvent TieGame = new();
 
     public static UnityEvent StartTurn = new();
-    public static UnityEvent NextTurn = new();
+    public static UnityEvent EndTurn = new();
 
     public static UnityEvent StartTicTacToe = new();
     public static UnityEvent StartChess = new();
